@@ -36,3 +36,11 @@
     transform: rotate(360deg);
   }
 }
+
+
+/* Hide only the "noDataRender" element */
+/* Hide only the "noDataRender" element */
+.custom-auto-complete .k-no-data::before {
+  display: none;
+}
+

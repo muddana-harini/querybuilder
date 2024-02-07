@@ -1,0 +1,31 @@
+
+{
+  "fields": [
+    { "name": "accidentDate", "label": "Accident Date", "datatype": "date", "inputType": "date"},
+    { "name": "conditionCode", "label": "Condition Code", "datatype": "text" },
+    { "name": "diagnosisCode", "label": "Diagnosis Code", "datatype": "number" },
+    { "name": "serviceDate", "label": "Service Date", "datatype": "date", "inputType": "date" }
+  ],
+  "operators": {
+    "accidentDate": [
+      { "name": "isNotNull", "label": "Is Present",  "arity": 1 },
+      { "name": "between", "label": "Between", "inputType": "date" }
+    ],
+    "conditionCode": [
+      { "name": "between", "label": "Between", "inputType": "text" },
+      { "name": "eq", "label": "Equal to", "inputType": "text" },
+      { "name": "isInSet", "label": "Is In Set of", "inputType": "text" }
+    ],
+    "diagnosisCode": [
+      { "name": "isInSet", "label": "Is In Set of", "inputType": "number" },
+      { "name": "isValidCode", "label": "Is Valid Code", "arity": 1 },
+      { "name": "isInList", "label": "Is in List", "valueEditorType": "select" },
+      { "name": "within", "label": "With in", "inputType": "number" },
+      { "name": "between", "label": "Between", "inputType": "number" },
+      { "name": "eq", "label": "Equal to", "inputType": "number" }
+    ],
+    "serviceDate": [
+      { "name": "between", "label": "Between", "inputType": "date" }
+    ]
+  }
+}
