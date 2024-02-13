@@ -19,7 +19,7 @@
     "diagnosisCode": [
       { "name": "isInSet", "label": "Is In Set of", "inputType": "number" },
       { "name": "isValidCode", "label": "Is Valid Code", "arity": 1 },
-      { "name": "isInList", "label": "Is in List", "valueEditorType": "select" },
+      { "name": "isInList", "label": "Is in List", "valueEditorType": "select" , "endPoint" : "api/url" },
       { "name": "within", "label": "With in", "inputType": "number" },
       { "name": "between", "label": "Between", "inputType": "number" },
       { "name": "eq", "label": "Equal to", "inputType": "number" }
