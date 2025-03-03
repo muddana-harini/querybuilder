@@ -6,9 +6,11 @@ import {
   formatQuery,
   isRuleGroup,
 } from 'react-querybuilder';
-
+import { CustomRuleGroup } from './CustomRuleGroup';
 import 'react-querybuilder/dist/query-builder.css';
 import input from './BenefitRulesInput.json';
+import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { QueryBuilderBootstrap } from "@react-querybuilder/bootstrap";
 
 const inputTypeOptions = [
   { name: 'dropDown1', label: 'Drop Down 1' },
@@ -31,13 +33,28 @@ const combinatorOptions = [
   { name: 'none', label: 'NONE' },
 ];
 
-const initialQuery = { combinator: 'and', rules: [] };
+const initialQuery = {
+  combinator: 'and',
+  rules: [
+    { id: '1', field: 'diagnosisCode', operator: 'eq', value: '' },
+  ],
+};
 
 const App = () => {
   const [query, setQuery] = useState(initialQuery);
   const [savedQuery, setSavedQuery] = useState(initialQuery);
   const [updatedFields, setUpdatedFields] = useState(fields);
-
+  const methods = useForm();
+  const {
+    handleSubmit,
+    register,
+    reset,
+    watch,
+    setValue,
+    control,
+    trigger,
+    formState: { errors },
+  } = methods;
   const handleQueryChange = (newQuery) => {
 
     processGroup(newQuery);
@@ -45,6 +62,34 @@ const App = () => {
     setQuery(newQuery);
   };
 
+  const updateQuery = (currentQuery, updatedGroup) => {
+    const recursiveUpdate = (query) => {
+      if (!query.rules) {
+        query.rules = []; // Ensure rules array exists
+      }
+  
+      if (query.id === updatedGroup.id) {
+        return {
+          ...query,
+          combinator: updatedGroup.combinator || 'AND', // Default to 'AND' if combinator is missing
+          rules: updatedGroup.rules || [], // Ensure rules array exists
+        };
+      }
+  
+      if (query.rules) {
+        return {
+          ...query,
+          rules: query.rules.map((rule) =>
+            isRuleGroup(rule) ? recursiveUpdate(rule) : rule
+          ),
+        };
+      }
+  
+      return query;
+    };
+  
+    return recursiveUpdate(currentQuery || { id: 'root', combinator: 'AND', rules: [] }); // Default query structure
+  };
   const processGroup = (rg) => {
     let hasEmptyRule = false;
 
@@ -165,14 +210,17 @@ const App = () => {
   return (
     <div>
       <h1>Benefit Rules</h1>
+      <QueryBuilderBootstrap>
       <QueryBuilder
         fields={fields} // Use the original fields without modification
         query={query}
         onQueryChange={handleQueryChange}
         getOperators={getOperators}
         combinators={combinatorOptions}
-        controlClassnames={{ queryBuilder: 'queryBuilder-branches' }}
         validator={defaultValidator}
+        resetOnOperatorChange={true}
+        controlClassnames={{ queryBuilder: 'queryBuilder-branches' }}
+
         getValues={(_f, op) =>
           op === 'isInList' ? inputTypeOptions : []
         }
@@ -189,7 +237,20 @@ const App = () => {
             return 'text';
           }
         }}
-      />
+        controlElements={{
+          ruleGroup: (props) => (
+            <CustomRuleGroup
+              {...props}
+              data={{ combinator: props?.combinator || query?.combinator || "AND", }} // Pass initial combinator value
+              setValue={setValue} // Pass setValue to update the form state
+              onChange={(updatedGroup) => {
+                setQuery((prevQuery) => updateQuery(prevQuery, updatedGroup)); // Update the query dynamically
+              }}
+            />
+          ),
+        }}
+        />
+        </QueryBuilderBootstrap>
 
       <button onClick={handleSaveClick}>Save</button>
 
